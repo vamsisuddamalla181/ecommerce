@@ -11,7 +11,6 @@ export interface IProduct extends Document {
         averageRating: number;
         numberOfRatings: number;
     }]
-    user:Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -28,7 +27,6 @@ const productSchema = new Schema<IProduct>({
         averageRating: { type: Number, default: 0 },
         numberOfRatings: { type: Number, default: 0 },
     }],
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 }, { timestamps: true });
 
 export const Product = model<IProduct>('product', productSchema);
