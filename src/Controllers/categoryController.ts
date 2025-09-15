@@ -36,18 +36,18 @@ export class categorycontroller {
 
     updateCategories = async (req: Request, res: Response) => {
         try {
-            const { name, description } = req.body
-            const { error } = await updateCategoryValidation.validate(req.body, { abortEarly: false })
+            const { error } =updateCategoryValidation.validate(req.body, { abortEarly: false })
+            if (error) 
+                return res.status(400).json({ errors: error.details.map(d => d.message).join(", ") });
+            const {name,description}=req.body
             const category = await Category.findByIdAndUpdate(
                 req.params.id,
-                { name, description },
-                { new: true }
+                { name, description }
             );
 
             if (!category) {
-                if (error) return res.status(400).json({ errors: error.details.map(d => d.message).join(", ") });
+                res.status(404).json({message:"user not found"})
             }
-
             res.json({ message: "Category updated successfully", category });
         } catch (err) {
             res.status(500).json({ message: "Server error", error: err });
