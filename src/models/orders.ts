@@ -2,7 +2,7 @@ import {Schema,model,Document,Types} from 'mongoose';
 export interface IOrder extends Document {
     userId: Types.ObjectId;
     products: [{
-        productId: string;
+        productId: Types.ObjectId;
         quantity: number;
         price: number;
     }];

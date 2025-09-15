@@ -12,7 +12,6 @@ yarn-error.log*
 .env
 
 # Build output
-dist/
 build/
 
 # VS Code settings
