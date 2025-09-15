@@ -13,7 +13,8 @@ export const signupvalidation=(data:any)=>{
             "string.empty": "Password is required",
             "string.min": "Password must be at least 5 characters",
             "string.pattern.base": "Password must contain at least one capital letter"
-        })
+        }),
+        role: joi.string().valid("user", "admin").default("user") 
     });
     return schema.validate(data, { abortEarly: false });
 };

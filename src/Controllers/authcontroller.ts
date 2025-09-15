@@ -13,7 +13,7 @@ export class Authcontroller {
             const errormessage = error.details.map(detail => detail.message).join(", ");
             return res.status(400).json({ message: errormessage });
         }
-        const { name, email, password } = req.body;
+        const { name, email, password ,role} = req.body;
         const exists = await User.findOne({ email });
         if (exists) {
             return res.status(400).json({ message: "User already exists" });
@@ -22,6 +22,7 @@ export class Authcontroller {
         const newuser = new User({
             name,
             email,
+            role,
             password: hashedpassword
         });
         await newuser.save();
@@ -31,7 +32,7 @@ export class Authcontroller {
     login = expressAsyncHandler(async (req: Request, res: Response) => {
         const { error } = loginValidation(req.body);
         if (error) {
-            const errormessage = error.details.map(detail => detail.message).join(", ");
+            const errormessage = error.details.map(d => d.message).join(", ");
             return res.status(400).json({ message: errormessage });
         }
         const { email, password } = req.body;
