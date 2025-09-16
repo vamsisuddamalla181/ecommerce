@@ -4,7 +4,7 @@ import { AuthRequest } from "./adminmiddleware";
 
 export const protectedRoute = (req: AuthRequest, res: Response, next: NextFunction) => {
 
-     const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+    const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
     console.log(token)
 
     if (!token) {
@@ -13,9 +13,17 @@ export const protectedRoute = (req: AuthRequest, res: Response, next: NextFuncti
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; role: string };
+        console.log("Decoded JWT:", decoded);  // 👈 see role value here
         req.user = { id: decoded.id, role: decoded.role };
         next();
     } catch (err) {
         res.status(401).json({ message: "Invalid token" });
     }
 };
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user?.role !== "admin") {
+        return res.status(403).json({ message: "Access denied: Admins only" });
+    }
+    next();
+};
+

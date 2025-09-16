@@ -26,7 +26,7 @@ export class Authcontroller {
             password: hashedpassword
         });
         await newuser.save();
-        const token = generateToken(newuser.id);
+        const token = generateToken(newuser);
         res.cookie("token", token, {
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production", 
@@ -60,7 +60,7 @@ export class Authcontroller {
         if (!ispassword) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        const token = generateToken(user.id);
+        const token = generateToken(user);
         return res.status(200).json({
             message: "User login successful",
             token,
