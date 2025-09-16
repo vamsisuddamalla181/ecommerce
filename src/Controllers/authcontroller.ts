@@ -7,8 +7,8 @@ import { loginValidation } from "../Validations/Loginvalidation";
 import { generateToken } from "../utils/generatetoken";
 
 export class Authcontroller {
-    signup = expressAsyncHandler(async (req: Request, res: Response) => {
-        const { error } = signupvalidation(req.body);
+    signup =(async (req: Request, res: Response) => {
+        const { error } = await signupvalidation(req.body);
         if (error) {
             const errormessage = error.details.map(detail => detail.message).join(", ");
             return res.status(400).json({ message: errormessage });
@@ -45,11 +45,10 @@ export class Authcontroller {
         });
     });
 
-    login = expressAsyncHandler(async (req: Request, res: Response) => {
-        const { error } = loginValidation(req.body);
+    login = (async (req: Request, res: Response) => {
+        const { error } = await loginValidation(req.body);
         if (error) {
-            const errormessage = error.details.map(d => d.message).join(", ");
-            return res.status(400).json({ message: errormessage });
+            return res.status(400).json({ message: error.details[0].message });
         }
         const { email, password } = req.body;
         const user = await User.findOne({ email });

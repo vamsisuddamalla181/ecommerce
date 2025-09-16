@@ -18,15 +18,14 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; role: string };
 
-    // 👇 check decoded payload
-    console.log("Decoded token:", decoded);
+
 
     if (!decoded.id || !decoded.role) {
       return res.status(401).json({ message: "Invalid token payload" });
     }
 
     req.user = { id: decoded.id, role: decoded.role };
-    return next(); // ✅ only call once
+    return next(); 
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
