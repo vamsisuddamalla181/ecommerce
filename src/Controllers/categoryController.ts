@@ -6,7 +6,8 @@ import { updateCategoryValidation } from "../Validations/categoryvalidation";
 export class categorycontroller {
     createCategory = async (req: Request, res: Response) => {
         const { error } = categoryValidation.validate(req.body, { abortEarly: false });
-        if (error) return res.status(400).json({ errors: error.details.map(d => d.message).join(", ") });
+        if (error) 
+            return res.status(400).json({ errors: error.details.map(d => d.message).join(", ") });
 
         try {
             const { name, description } = req.body;
