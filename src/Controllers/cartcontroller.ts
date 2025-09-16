@@ -1,0 +1,93 @@
+import { Request, Response } from "express";
+import { Cart } from "../models/Cart";
+import { AuthRequest } from "../Middlewares/adminmiddleware";
+
+export class CartController {
+    // Add product to cart
+    addToCart = async (req: AuthRequest, res: Response) => {
+        try {
+            const { productId, quantity } = req.body;
+            const userId = req.user?.id; // from auth middleware
+
+            let cart = await Cart.findOne({ userId });
+
+            if (!cart) {
+                cart = new Cart({ userId, products: [{ productId, quantity }] });
+            } else {
+                const existingProduct = cart.products.find(
+                    (p) => p.productId.toString() === productId
+                );
+
+                if (existingProduct) {
+                    existingProduct.quantity += quantity;
+                } else {
+                    cart.products.push({ productId, quantity });
+                }
+            }
+
+            await cart.save();
+            res.status(200).json({ message: "Product added to cart", cart });
+        } catch (err: any) {
+            res.status(500).json({ message: "Server error", error: err.message || err });
+        }
+    };
+
+    // Get cart
+    getCart = async (req: AuthRequest, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+            const cart = await Cart.findOne({ userId }).populate("products.productId");
+            res.json(cart || { products: [] });
+        } catch (err: any) {
+            res.status(500).json({ message: "Server error", error: err.message });
+        }
+    };
+
+    // Update quantity
+    updateCartItem = async (req: AuthRequest, res: Response) => {
+        try {
+            const { productId, quantity } = req.body;
+            const userId = req.user?.id;
+
+            const cart = await Cart.findOne({ userId });
+            if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+            const item = cart.products.find(
+                (p) => p.productId.toString() === productId
+            );
+            if (!item) return res.status(404).json({ message: "Product not in cart" });
+
+            item.quantity = quantity;
+            await cart.save();
+
+            res.json({ message: "Cart updated", cart });
+        } catch (err: any) {
+            res.status(500).json({ message: "Server error", error: err.message || err });
+        }
+    };
+
+    // Remove product
+    removeFromCart = async (req: AuthRequest, res: Response) => {
+        try {
+            const { productId } = req.params;
+            const userId = req.user?.id;
+            if (!productId) {
+                return res.status(400).json({ message: "Product ID is required" });
+            }
+            const cart = await Cart.findOne({ userId });
+            if (!cart)
+                return res.status(404).json({ message: "Cart not found" });
+
+            cart.products = cart.products.filter(
+                (p) => p.productId.toString() !== productId
+            );
+
+            await cart.save();
+            res.json({ message: "Product removed", cart });
+        } catch (err: any) {
+            res.status(500).json({ message: "Server error", error: err.message || err });
+        }
+    };
+}

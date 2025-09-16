@@ -7,6 +7,7 @@ import router from "./Routes/authroutes.ts";
 import categoryrouter from "./Routes/categoryRoutes.ts";
 import cookieparser from "cookie-parser";
 import productrouter from "./Routes/productRoutes.ts";
+import cartrouter from "./Routes/cartroutes";
 const PORT=process.env.PORT||5000;
 dotenv.config();
 const app=express();
@@ -21,6 +22,7 @@ connectDB();
 app.use("/",router)
 app.use("/",categoryrouter)
 app.use("/api/products",productrouter)
+app.use("/api/cart",cartrouter)
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`);
 })

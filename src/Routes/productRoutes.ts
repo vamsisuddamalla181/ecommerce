@@ -1,19 +1,21 @@
-// routes/productRoutes.ts
 import express from "express";
-import { protectedRoute } from "../Middlewares/protectedRoute";
-import { createProduct,
-  getUserProducts,
+import {
+  createProduct,
+  getAllProducts,
   getProductById,
   updateProduct,
-  deleteProduct, } from "../Controllers/productcontroller";
-import { authMiddleware } from "../Middlewares/adminmiddleware";
+  deleteProduct,
+  getProductsByCategory,
+} from "../Controllers/productcontroller";
+import { protectedRoute } from "../Middlewares/protectedRoute";
 
-const productrouter = express.Router();
+const productRouter = express.Router();
 
-productrouter.post("/", protectedRoute, createProduct);       // Add product
-productrouter.get("/", protectedRoute, getUserProducts);      // Get all user products
-productrouter.get("/:id", protectedRoute, getProductById);    // Get single product
-productrouter.put("/:id", protectedRoute, updateProduct);     // Update product
-productrouter.delete("/:id", protectedRoute, deleteProduct);  // Delete product
+productRouter.post("/", protectedRoute, createProduct);
+productRouter.get("/", getAllProducts);
+productRouter.get("/:id", getProductById);
+productRouter.put("/:id", protectedRoute, updateProduct);
+productRouter.delete("/:id", protectedRoute, deleteProduct);
+productRouter.get("/category/:category", getProductsByCategory);
 
-export default productrouter;
+export default productRouter;
