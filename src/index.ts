@@ -16,7 +16,7 @@ const app=express();
 app.use(cookieparser())
 app.use(helmet());
 app.use(cors({
-  origin: "http://127.0.0.1:5500",
+  origin: ["http://127.0.0.1:5500","http://127.0.0.1:65520","http://127.0.0.1:58984"],
   credentials: true
 }));
 app.use(express.json());
