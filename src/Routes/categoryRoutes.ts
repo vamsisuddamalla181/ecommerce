@@ -12,8 +12,8 @@ const categories=new categorycontroller()
 categoryrouter.get("/get-all-category", categories.getCategories);
 
 categoryrouter.post("/post-category",protectedRoute, authMiddleware, isAdmin, categories.createCategory);
-categoryrouter.put("/update-catgeory/:id",protectedRoute, authMiddleware, adminonly,categories.updateCategories );
+categoryrouter.put("/update-category/:id",protectedRoute, authMiddleware, adminonly,categories.updateCategories );
 categoryrouter.delete("/delete-category/:id",protectedRoute, authMiddleware, adminonly,categories.deleteCategories );
 
 export default categoryrouter;
-
+ 
