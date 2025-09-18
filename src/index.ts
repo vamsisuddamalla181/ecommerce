@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import express from "express";
 import dotenv from "dotenv";
 import helmet from "helmet";
+import cors from "cors";
 import { connectDB } from "./db/mongodb.ts";
 import router from "./Routes/authroutes.ts";
 import categoryrouter from "./Routes/categoryRoutes.ts";
@@ -14,6 +15,10 @@ dotenv.config();
 const app=express();
 app.use(cookieparser())
 app.use(helmet());
+app.use(cors({
+  origin: "http://127.0.0.1:5500",
+  credentials: true
+}));
 app.use(express.json());
 
 app.use(express.urlencoded({extended:true}));
