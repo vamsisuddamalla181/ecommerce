@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Cart } from "../models/Cart";
+import { Product } from "../models/product";
 import { AuthRequest } from "../Middlewares/adminmiddleware";
 
 export class CartController {
@@ -7,16 +8,25 @@ export class CartController {
     addToCart = async (req: AuthRequest, res: Response) => {
         try {
             const { productId, quantity } = req.body;
-            const userId = req.user?.id; // from auth middleware
+            const userId = req.user?.id;
 
-            let cart = await Cart.findOne({ userId }).populate({
-                path: "products.productId",
-                select: "name price description", 
-            });
+            // Fetch product details
+            const product = await Product.findById(productId);
+            if (!product) return res.status(404).json({ message: "Product not found" });
 
+            let cart = await Cart.findOne({ userId });
 
             if (!cart) {
-                cart = new Cart({ userId, products: [{ productId, quantity }] });
+
+                cart = new Cart({
+                    userId,
+                    products: [{
+                        productId,
+                        quantity,
+                        name: product.name,
+                        price: product.price
+                    }]
+                });
             } else {
                 const existingProduct = cart.products.find(
                     (p) => p.productId.toString() === productId
@@ -24,12 +34,20 @@ export class CartController {
 
                 if (existingProduct) {
                     existingProduct.quantity += quantity;
+                    existingProduct.name = product.name; 
+                    existingProduct.price = product.price; 
                 } else {
-                    cart.products.push({ productId, quantity });
+                    cart.products.push({
+                        productId,
+                        quantity,
+                        name: product.name,
+                        price: product.price
+                    });
                 }
             }
 
             await cart.save();
+
             res.status(200).json({ message: "Product added to cart", cart });
         } catch (err: any) {
             res.status(500).json({ message: "Server error", error: err.message || err });
@@ -42,7 +60,7 @@ export class CartController {
             const userId = req.user?.id;
             if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-            const cart = await Cart.findOne({ userId }).populate("products.productId");
+            const cart = await Cart.findOne({ userId });
             res.json(cart || { products: [] });
         } catch (err: any) {
             res.status(500).json({ message: "Server error", error: err.message });
@@ -58,14 +76,19 @@ export class CartController {
             const cart = await Cart.findOne({ userId });
             if (!cart) return res.status(404).json({ message: "Cart not found" });
 
+            const product = await Product.findById(productId);
+            if (!product) return res.status(404).json({ message: "Product not found" });
+
             const item = cart.products.find(
                 (p) => p.productId.toString() === productId
             );
             if (!item) return res.status(404).json({ message: "Product not in cart" });
 
             item.quantity = quantity;
-            await cart.save();
+            item.name = product.name; // Update name
+            item.price = product.price; // Update price
 
+            await cart.save();
             res.json({ message: "Cart updated", cart });
         } catch (err: any) {
             res.status(500).json({ message: "Server error", error: err.message || err });
@@ -77,12 +100,10 @@ export class CartController {
         try {
             const { productId } = req.params;
             const userId = req.user?.id;
-            if (!productId) {
-                return res.status(400).json({ message: "Product ID is required" });
-            }
+            if (!productId) return res.status(400).json({ message: "Product ID is required" });
+
             const cart = await Cart.findOne({ userId });
-            if (!cart)
-                return res.status(404).json({ message: "Cart not found" });
+            if (!cart) return res.status(404).json({ message: "Cart not found" });
 
             cart.products = cart.products.filter(
                 (p) => p.productId.toString() !== productId
@@ -95,6 +116,7 @@ export class CartController {
         }
     };
 }
+
 
 
 
