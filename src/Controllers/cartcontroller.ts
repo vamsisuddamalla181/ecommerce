@@ -9,7 +9,11 @@ export class CartController {
             const { productId, quantity } = req.body;
             const userId = req.user?.id; // from auth middleware
 
-            let cart = await Cart.findOne({ userId });
+            let cart = await Cart.findOne({ userId }).populate({
+                path: "products.productId",
+                select: "name price description", 
+            });
+
 
             if (!cart) {
                 cart = new Cart({ userId, products: [{ productId, quantity }] });
