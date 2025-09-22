@@ -60,6 +60,12 @@ export class Authcontroller {
             return res.status(400).json({ message: "Invalid credentials" });
         }
         const token = generateToken(user);
+         res.cookie("token", token, {
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === "production", 
+            sameSite: "strict",
+            maxAge: 24 * 60 * 60 * 1000,
+        });
         return res.status(200).json({
             message: "User login successful",
             token,
